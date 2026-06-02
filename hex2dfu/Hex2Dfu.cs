@@ -60,8 +60,11 @@ namespace nanoFramework.Tools
                     {
                         if (offset + hex.Address - currentImageElement.ElementAddress > binDestination.Length)
                         {
-                            currentImageElement.Data = binDestination.ToArray();
-                            imageElements.Add(currentImageElement);
+                            if (binDestination.Length > 0)
+                            {
+                                currentImageElement.Data = binDestination.ToArray();
+                                imageElements.Add(currentImageElement);
+                            }
                             currentImageElement = new ImageElement();
                             currentImageElement.ElementAddress = (uint)offset + hex.Address;
                             binDestination.SetLength(0);
@@ -97,8 +100,11 @@ namespace nanoFramework.Tools
                     }
                 }
 
-                currentImageElement.Data = binDestination.ToArray();
-                imageElements.Add(currentImageElement);
+                if (binDestination.Length > 0)
+                {
+                    currentImageElement.Data = binDestination.ToArray();
+                    imageElements.Add(currentImageElement);
+                }
             }
 
             string baseFileName = Path.GetFileNameWithoutExtension(hexFile);
@@ -106,10 +112,9 @@ namespace nanoFramework.Tools
             for (int i = 0; i < imageElements.Count; i++)
             {
                 ImageElement imageElement = imageElements[i];
-                string binFileName = $"{baseFileName}_element_{i}.bin";
-                if(imageElements.Count > 1)
-                    binFileName += $"_element_{i}";
-                binFileName += ".bin";
+                string binFileName = imageElements.Count > 1
+                    ? $"{baseFileName}_element_{i}.bin"
+                    : $"{baseFileName}.bin";
 
                 using (FileStream fs = new FileStream(binFileName, FileMode.Create))
                 {
